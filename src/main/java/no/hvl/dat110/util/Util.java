@@ -37,17 +37,21 @@ public class Util {
 	 * @return true if (lower <= id <= upper) or false otherwise
 	 */
 	public static boolean checkInterval(BigInteger id, BigInteger lower, BigInteger upper) {
-		// Hint:
-		// using mod = 10, then the interval (6, 2) = (6, 7, 8, 9, 0, 1, 2)
-		// The interval (6, 2) using the notation above means; pred = 6 and node = 2
-		// if id = 4, then (6 < 4 <= 2) = false  
-		// if id = 9, then (6 < 9 <= 2) = true
 		
-		// Task: given an identifier, id: check whether pred < id <= node
-		
-		return false;
-
+		if (id == null || lower == null || upper == null) {
+	        // Handle null parameters appropriately, possibly with an exception or a log message
+	        throw new IllegalArgumentException("Parameters to checkInterval cannot be null.");
+	    }
+	    if (lower.compareTo(upper) < 0) {
+	        // Om lower < upper, sjekker om id er i intervallet [lower, upper] 
+	        return id.compareTo(lower) >= 0 && id.compareTo(upper) <= 0;
+	    } else {
+	        //Ditta dekker tilfellet der intervallet henger seg rundt maksimum verdi.
+	        //Derav om id er større enn lower eller id er mindre enn eller lik den upper, så er den i intervallet
+	        return id.compareTo(lower) >= 0 || id.compareTo(upper) <= 0;
+	    }
 	}
+
 	
 	public static List<String> toString(List<NodeInterface> list) throws RemoteException {
 		List<String> nodestr = new ArrayList<String>();

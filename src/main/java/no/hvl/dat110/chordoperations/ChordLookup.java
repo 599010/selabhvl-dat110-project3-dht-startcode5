@@ -32,42 +32,61 @@ public class ChordLookup {
 	}
 	
 	public NodeInterface findSuccessor(BigInteger key) throws RemoteException {
-		// ask this node to find the successor of key
-		
-		// get the successor of the node
-		
-		// check that key is a member of the set {nodeid+1,...,succID} i.e. (nodeid+1 <= key <= succID) using the checkInterval
-		
-		// if logic returns true, then return the successor
-		
-		// if logic returns false; call findHighestPredecessor(key)
-		
-		// do highest_pred.findSuccessor(key) - This is a recursive call until logic returns true
-				
-		return null;					
+	    NodeInterface currentNode = this.node;
+	    BigInteger currentNodeId = currentNode.getNodeID();
+	    
+	    // First check if the key is within the current node and its successor
+	    if (Util.checkInterval(key, currentNodeId.add(BigInteger.ONE), currentNode.getSuccessor().getNodeID())) {
+	        return currentNode.getSuccessor();
+	    }
+
+	    // Otherwise, start the iterative process
+	    while (true) {
+	        // Find the highest predecessor of the key in the current node's finger table
+	        NodeInterface highestPredecessor = findHighestPredecessor(currentNode, key);
+	        BigInteger highestPredecessorId = highestPredecessor.getNodeID();
+
+	        // If the highest predecessor is the current node itself, use its successor
+	        if (highestPredecessorId.equals(currentNodeId)) {
+	            return highestPredecessor.getSuccessor();
+	        }
+	        
+	        // Move the current node to the highest predecessor
+	        currentNode = highestPredecessor;
+	        currentNodeId = currentNode.getNodeID();
+
+	        // Check if the key is within the new current node and its successor
+	        BigInteger successorId = currentNode.getSuccessor().getNodeID();
+	        if (Util.checkInterval(key, currentNodeId.add(BigInteger.ONE), successorId)) {
+	            return currentNode.getSuccessor();
+	        }
+
+	        
+	    }
 	}
-	
-	/**
-	 * This method makes a remote call. Invoked from a local client
-	 * @param ID BigInteger
-	 * @return
-	 * @throws RemoteException
-	 */
-	private NodeInterface findHighestPredecessor(BigInteger ID) throws RemoteException {
-		
-		// collect the entries in the finger table for this node
-		
-		// starting from the last entry, iterate over the finger table
-		
-		// for each finger, obtain a stub from the registry
-		
-		// check that finger is a member of the set {nodeID+1,...,ID-1} i.e. (nodeID+1 <= finger <= key-1) using the ComputeLogic
-		
-		// if logic returns true, then return the finger (means finger is the closest to key)
-		
-		return (NodeInterface) node;			
+
+	private NodeInterface findHighestPredecessor(NodeInterface currentNode, BigInteger key) throws RemoteException {
+	    List<NodeInterface> fingerTable = currentNode.getFingerTable();
+	    BigInteger currentNodeId = currentNode.getNodeID();
+
+	    // Iterate over the finger table from farthest to closest
+	    for (int i = fingerTable.size() - 1; i >= 0; i--) {
+	        NodeInterface finger = fingerTable.get(i);
+	        BigInteger fingerId = finger.getNodeID();
+
+	        // Find the closest preceding node of the key
+	        if (Util.checkInterval(fingerId, currentNodeId.add(BigInteger.ONE), key.subtract(BigInteger.ONE))) {
+	            return finger;
+	        }
+	    }
+
+	    // Return current node if no closer node is found in the finger table
+	    return currentNode;
 	}
-	
+
+
+
+
 	public void copyKeysFromSuccessor(NodeInterface succ) {
 		
 		Set<BigInteger> filekeys;

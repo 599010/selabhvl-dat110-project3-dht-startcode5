@@ -57,14 +57,23 @@ public class FileManager {
 	}
 	
 	public void createReplicaFiles() {
-	 	
-		// set a loop where size = numReplicas
-		
-		// replicate by adding the index to filename
-		
-		// hash the replica
-		
-		// store the hash in the replicafiles array.
+	    
+	    // Ensure filename is set before creating replicas
+	    if (filename == null || filename.isEmpty()) {
+	        logger.error("Filename is not set. Cannot create replica files.");
+	        return;
+	    }
+	    
+	    for(int i = 0; i < numReplicas; i++) {
+	        // Append the index to the filename to create a replica
+	        String replicaName = filename + i;
+	        
+	        // Hash the replica name
+	        BigInteger replicaHash = Hash.hashOf(replicaName);
+	        
+	        // Store the hash in the replicafiles array
+	        replicafiles[i] = replicaHash;
+	    }
 	}
 	
     /**
